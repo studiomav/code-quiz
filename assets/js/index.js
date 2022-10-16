@@ -2,8 +2,6 @@ var cardTitle = $(".card-title");
 var cardText = $(".card-text");
 var startBtn = $("#start-btn");
 var timerTxt = $("#timer");
-
-var state = "menu";
 var currentQuestion = 0;
 var timer;
 var timeleft = 100;
@@ -19,14 +17,17 @@ var questions =
 function quizStart()
 {
     updateQuestions();
-    state = "quiz";
+    timeleft = 100;
+    score = 0;
     timer = setInterval((tick), 1000);
 }
 
 function quizFail()
 {
+    clearInterval(timer);
     cardTitle.text("Quiz Failed");
-    cardText.text("You have depleted the allowed time for this quiz.");
+    cardText.text("You have depleted the allowed time for this quiz. Press begin to try again.");
+    startBtn[0].style.display = "";
 }
 
 function quizComplete()
@@ -34,18 +35,18 @@ function quizComplete()
     clearInterval(timer);
     cardTitle.text("Quiz Complete");
     cardText.text("You have completed the quiz with a score of: " + score);
+    startBtn[0].style.display = "";
 }
 
 function tick()
 {
     if(timeleft > 0)
     {
-        timeleft--;
+        timeleft--; 
         timerTxt.text("Time Remaining: " + timeleft);
     }
     else
     {
-        state = "fail";
         quizFail();
     }
 }
@@ -64,8 +65,6 @@ function updateQuestions()
 
 function nextQuestion()
 {
-    console.log("current question: " + currentQuestion);
-    console.log(Object.values(questions).length - 1);
     if (currentQuestion < Object.values(questions).length - 1)
     {
         currentQuestion++;
