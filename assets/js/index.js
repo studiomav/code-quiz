@@ -2,10 +2,13 @@ var cardTitle = $(".card-title");
 var cardText = $(".card-text");
 var startBtn = $("#start-btn");
 var timerTxt = $("#timer");
+var scoresText = $("#scores-text");
+var leaderBoard = {};
 var currentQuestion = 0;
 var timer;
 var timeleft = 100;
 var score = 0;
+
 var questions = 
 {
     "What does HTML Stand for?" : [["Hyper Text Markup Language", "High Tide Makes Low", "HTML", "Hello Text Marker Line"], 0],
@@ -14,8 +17,17 @@ var questions =
     "String values must be enclosed in what symbol?" : [["Brackets", "Quotations", "Parentheses", "Exclamations"], 1]
 };
 
+function updateScores()
+{
+    leaderBoard = JSON.parse(localStorage.getItem("mav-quiz-leaderboard"));
+    if (leaderBoard == null) leaderBoard = {};
+    var lbText = JSON.stringify(leaderBoard, undefined, 2).replace(/[{}]/g, '');
+    scoresText.text(lbText);
+}
+
 function quizStart()
 {
+    currentQuestion = 0;
     updateQuestions();
     timeleft = 100;
     score = 0;
@@ -35,6 +47,7 @@ function quizComplete()
     clearInterval(timer);
     cardTitle.text("Quiz Complete");
     cardText.text("You have completed the quiz with a score of: " + score);
+    cardText.append(`</br><p id="save-prompt">Enter your name to save your score:</br><input id="name" type="text" style="display:inline; width:70%"></input><span id="save-btn" class="btn btn-secondary">Save</span></br></br>Or, press begin to try again.</p>`);
     startBtn[0].style.display = "";
 }
 
@@ -58,7 +71,7 @@ function updateQuestions()
     for (var i = 0; i < Object.values(questions).length; i++)
     {
         var answer = Object.values(questions)[currentQuestion][0][i];
-        cardText.append(`</br><a href="#" num="` + i + `" class="answer btn btn-primary">` + answer + "</a>");
+        cardText.append(`</br><span num="` + i + `" class="answer btn btn-primary">` + answer + "</span>");
     }
     cardText.append("</br>Score: " + score);
 }
@@ -92,4 +105,18 @@ startBtn.click(function()
 
 $(document).on('click', '.answer', function(event){
     checkAnswer(currentQuestion, $(this).attr('num'));
+});
+
+$(document).on('click', '#save-btn', function(event){
+    updateScores();
+    var newName = $("#name").val();
+    Object.assign(leaderBoard, {[newName] : score});
+    localStorage.setItem("mav-quiz-leaderboard", JSON.stringify(leaderBoard));
+    updateScores();
+    var del = document.getElementById("save-prompt")
+    del.parentNode.removeChild(del);
+});
+
+$(document).on('click', '#high-scores', function(event){
+    updateScores();
 });
