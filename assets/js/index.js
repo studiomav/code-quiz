@@ -1,3 +1,4 @@
+//setting our environment variables
 var cardTitle = $(".card-title");
 var cardText = $(".card-text");
 var startBtn = $("#start-btn");
@@ -9,6 +10,7 @@ var timer;
 var timeleft = 100;
 var score = 0;
 
+//a list of quiz questions/answers that can be added to, the rest of the code adapts to the array length. The final numeric value is the index of the correct answer
 var questions = 
 {
     "What does HTML Stand for?" : [["Hyper Text Markup Language", "High Tide Makes Low", "HTML", "Hello Text Marker Line"], 0],
@@ -17,6 +19,7 @@ var questions =
     "String values must be enclosed in what symbol?" : [["Brackets", "Quotations", "Parentheses", "Exclamations"], 1]
 };
 
+//updates the score list and prints it to the html modal
 function updateScores()
 {
     leaderBoard = JSON.parse(localStorage.getItem("mav-quiz-leaderboard"));
@@ -25,6 +28,7 @@ function updateScores()
     scoresText.text(lbText);
 }
 
+//initializes the quiz
 function quizStart()
 {
     currentQuestion = 0;
@@ -34,6 +38,7 @@ function quizStart()
     timer = setInterval((tick), 1000);
 }
 
+//called when time runs out, quiz will fail and the user is ineligible for score saving
 function quizFail()
 {
     clearInterval(timer);
@@ -42,6 +47,7 @@ function quizFail()
     startBtn[0].style.display = "";
 }
 
+//called when the last question is answered, processes score and offers saving
 function quizComplete()
 {
     clearInterval(timer);
@@ -51,6 +57,7 @@ function quizComplete()
     startBtn[0].style.display = "";
 }
 
+//1 second tick, decrements the timer
 function tick()
 {
     if(timeleft > 0)
@@ -64,6 +71,7 @@ function tick()
     }
 }
 
+//changes the question and options
 function updateQuestions()
 {
     cardTitle.text("Question " + (currentQuestion + 1));
@@ -76,6 +84,7 @@ function updateQuestions()
     cardText.append("</br>Score: " + score);
 }
 
+//checks if there are more questions to update to
 function nextQuestion()
 {
     if (currentQuestion < Object.values(questions).length - 1)
@@ -86,6 +95,7 @@ function nextQuestion()
     else quizComplete();
 }
 
+//checks if the selected answer is correct
 function checkAnswer(q, a)
 {
     if (Object.values(questions)[currentQuestion][1] == a)
@@ -96,6 +106,7 @@ function checkAnswer(q, a)
     nextQuestion();
 }
 
+//called when the start button is clicked
 startBtn.click(function()
     {
         this.style.display = "none";
@@ -103,10 +114,12 @@ startBtn.click(function()
     }
 );
 
+//called when any answer option is clicked
 $(document).on('click', '.answer', function(event){
     checkAnswer(currentQuestion, $(this).attr('num'));
 });
 
+//called when the save score button is clicked
 $(document).on('click', '#save-btn', function(event){
     updateScores();
     var newName = $("#name").val();
@@ -117,6 +130,7 @@ $(document).on('click', '#save-btn', function(event){
     del.parentNode.removeChild(del);
 });
 
+//called when the "view high scores" button is clicked
 $(document).on('click', '#high-scores', function(event){
     updateScores();
 });
